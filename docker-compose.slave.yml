@@ -1,0 +1,5 @@
+version: '3'
+
+services:
+  redis:
+    command: redis-server --slaveof ${MASTER} 6379
