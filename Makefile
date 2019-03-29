@@ -4,9 +4,11 @@
 MAKEPATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 PWD := $(dir $(MAKEPATH))
 
+HOST := `hostname`
+
 MASTER_NAME ?= defaultmaster
 QUORUM ?= 2
-ANNOUNCE_IP ?= $(shell getent hosts $(hostname) | head -1  | cut -d' ' -f1)
+ANNOUNCE_IP ?= $(shell getent hosts $(HOST) | head -1  | cut -d' ' -f1)
 
 BOOL_VAL := y n
 MASTERCONF_FILE := MASTER_CONF
