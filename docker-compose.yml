@@ -2,14 +2,21 @@ version: '3'
 
 services:
   redis:
-    image: redis:4.0.10-alpine
+    image: redis:5.0.4-alpine
     ports:
       - 6379:6379
+    sysctls:
+      net.core.somaxconn: 1024
+      net.ipv4.tcp_syncookies: 0
 
   sentinel:
-    image: s7anley/redis-sentinel-docker:4.0.10
+    build: .
+    image: redis-sentinel
     ports:
       - 26379:26379
+    sysctls:
+      net.core.somaxconn: 1024
+      net.ipv4.tcp_syncookies: 0
     env_file: .env
     environment:
       - MASTER_NAME=mymaster
@@ -17,5 +24,7 @@ services:
       - MASTER
       - ANNOUNCE_IP
       - SLAVES
+      - DOWN_AFTER=5000
+      - FAILOVER_TIMEOUT=10000
     depends_on:
       - redis
