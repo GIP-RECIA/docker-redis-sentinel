@@ -79,4 +79,9 @@ if [ "$MASTER_NAME" ]; then
     fi
 fi
 
+if [ "$MEMORY" ]; then
+    echo "maxmemory $MEMORY" >> $SENTINEL_CONFIGURATION_FILE
+    echo "maxmemory-policy allkeys-lru" >> $SENTINEL_CONFIGURATION_FILE
+fi
+
 exec redis-server $SENTINEL_CONFIGURATION_FILE --sentinel

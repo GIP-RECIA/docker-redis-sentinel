@@ -31,6 +31,9 @@ else
 endif
 	@[ -f .env ] && mv .env .env.`date +'%Y%m%d_%H:%M:%S'` || true
 	@echo "MASTER_NAME=$(MASTER_NAME)\nQUORUM=$(QUORUM)\nMASTER=$(MASTER)\nANNOUNCE_IP=$(ANNOUNCE_IP)" > .env
+ifdef MEMORY
+	@echo "MEMORY=$(MEMORY)\n" >> .env
+endif
 	@echo "Generated .env file :" && cat .env
 
 run: .env

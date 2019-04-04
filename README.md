@@ -14,13 +14,49 @@ So it permits to deploy at least on redis + sentinel instance for a master serve
 
 Also this project provide an easy to use command tool from a `Makefile` (make or any equivalent is required)
 
+#### Host system conf for performance
+
+redis for better performance and to avoid WARN logs require some system configuration.  Here are logs shown at run :
+```log
+WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+```
+
+With docker the following paramaters should be applied on the host and not on docker images:
+```shell
+sudo su -
+touch /etc/rc.local
+echo 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.local
+echo 'echo never > /sys/kernel/mm/transparent_hugepage/defrag' >> /etc/rc.local
+echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
+```
+
+To check that all properties are applied you should test theses commands:
+```shell
+sudo su -
+sysctl net.core.somaxconn
+# should return value to 0
+sysctl vm.overcommit_memory
+# should return value to 0
+sysctl vm.nr_hugepages && grep -i HugePages_Total /proc/meminfo
+# should return values to 0
+# or
+cat /sys/kernel/mm/transparent_hugepage/enabled
+# where never should be selected
+ ```
+
+The following redis/sentinel WARN log
+ ```log
+ WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+ ```
+ is fixed on Dockerfile.
+
 ### Installing
 
 ```shell
 git clone https://github.com/GIP-RECIA/docker-redis-sentinel.git
 cd docker-redis-sentinel
 ```
-
 
 ### Configuring
 The configuration need some properties to be set and that will be used on all services deplyed
@@ -36,6 +72,7 @@ make configure MASTER_DNS=yourhostname IS_MASTER=y ARGS...
 * **MASTER_NAME** - *Optional* - ***Default value is `defaultmaster`*** - The redis cluster group name.
 * **QUORUM** - *Optional* - ***Default value is `2`*** - The sentinel QUORUM property.
 * **ANNOUNCE_IP** - *Optional* - The IP of instance that could be used by other redis + sentinel instance. A default value is resolved.
+* **MEMORY** - *Optional* - ***Default value is `64mb`*** - The memory size to fix for the redis server
 
 All these params will be saved in a .env file and a 'MODE' file (create a `SLAVE_CONF` or `MASTER_CONF` file) for the run needs, so you can modify all of these files.
 
