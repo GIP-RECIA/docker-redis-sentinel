@@ -7,6 +7,6 @@ set -e
 args=("--maxmemory $MEMORY")
 args+=("--maxmemory-policy allkeys-lru")
 
-echo "*** Runing $@ ${args[@]}"
+echo "*** Running $@ ${args[@]}"
 
 exec "$@" "${args[@]}"

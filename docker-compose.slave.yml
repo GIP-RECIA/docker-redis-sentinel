@@ -2,4 +2,4 @@ version: '3'
 
 services:
   redis:
-    command: redis-server --daemonize yes --slaveof ${MASTER} 6379
+    command: redis-server --slaveof ${MASTER} 6379
